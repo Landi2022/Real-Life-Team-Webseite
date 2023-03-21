@@ -17,18 +17,76 @@
     </head>
     <body class="text-center">
 
-        <!-- Navigation bar-->
-        <ul class="navigationbar">
-            <li><a href="login.html">Login</a></li>
-            <li><a href="patner.html">Partner</a></li>
-            <li><a href="eureSkins.html">Eure Skins</a></li>
-            <li><a href="bewerbungen.html">Bewerben</a></li>
-            <li><a href="blog.html">Blog</a></li>
-            <li><a href="unserTeam.html">Team</a></li>
-            <li><a href="Downloads.html">Downloads</a></li>
-            <li><a href="https://www.youtube.com/reallifeteam" class="fa fa-youtube"></a></li>
-            <li><a href="https://www.instagram.com/real_life_team_official/" class="fa fa-instagram"></a></li>
-            <li><a href="https://www.twitch.tv/reallifeteam" class="fa fa-twitch"></a></li>
-    </ul>   
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+              <img src="Assets/Bilder/RLT_LOGO.png" alt="" width="60" height="60">
+            </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-link" aria-current="page" href="index.html">Home</a>
+              <a class="nav-link active" href="bewerbungen.html">Bewerben</a>
+              <a class="nav-link" href="blog.html">Blog</a>
+              <a class="nav-link" href="Downloads.html">Downloads</a>
+              <a class="nav-link" href="eureSkins.html">Eure Mods</a>
+              <a class="nav-link" href="patner.html">Partner</a>
+              <a class="nav-link" href="unserTeam.html">Team</a>
+              <a class="nav-link" href="login.html">Login</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+          
+      <div class="container container-center">
+        <div class="row">
+            <div class="col text-center">
+                <img class="mb-4" src="Assets/Bilder/RLT_LOGO.png" width="125" height="125">
+                <h1 class="h3 mb-3 fw-normal">Bewerbungs Formular</h1>
+            </div>
+        </div>
+
+          <div class="row justify-content-center">
+            <div class="col-sm-12 col-md-5 col-xl-3">
+                <div class="form-floating">
+                    <input type="text" class="form-control" id="discordInput" placeholder="Echter Vorname">
+                    <label for="discordInput">Echter Vorname</label>
+                  </div><br>
+
+                  <div class="form-floating">
+                    <input type="email" class="form-control" id="discordInput" placeholder="WUmps#2015">
+                    <label for="discordInput">Discord Tag</label>
+                  </div><br>
+
+                  <div class="form-floating">
+                    <input type="number" class="form-control" id="alterInput" placeholder="Alter">
+                    <label for="alterInput">Alter</label>
+                  </div><br>
+
+                  <div class="form-floating">
+                    <input type="disabled" class="form-control" id="bewerbungTextInput" placeholder="BewerbungsText">
+                    <label for="bewerbungTextInput">Bewerbungs Text</label>
+                  </div><br>
+
+                  <div class="input-group mb-3">
+                    <input type="file" class="form-control" id="inputGroupFile02">
+                    <label class="input-group-text" for="inputGroupFile02">Upload</label>
+                  </div><br>
+
+                  <div class="input-group mb-3">
+                    <div class="input-group-text">
+                      <input class="form-check-input mt-0" type="checkbox" value="" aria-label="Checkbox for following text input">
+                    </div>
+                    <label for="bewerbungTextInput">
+                      Hiermit akzeptiere ich, das ich<br>in
+                      Videos/Livestreams<br>vom 
+                      Team-Kanal/<br>Kanälen
+                      von Team-Mitgliedern<br>zu hören bin</label>
+                  </div><br>
+
+                  <button id="loginSubmitButton" class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+
     </body>
 </html>
