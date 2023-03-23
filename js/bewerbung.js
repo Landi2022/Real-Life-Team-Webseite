@@ -53,7 +53,4 @@ async function submitContact(emailInput, realName, alter, bewerbung) {
     if(response.status == 500) {
         
     }
-    
-
-    console.log(discordTag);
 }

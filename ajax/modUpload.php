@@ -9,12 +9,15 @@ session_start([
     "cookie_lifetime" => 86400,
 ]);
 
-
-$json = file_get_contents('php://input');
+//application/json
+/*$json = file_get_contents('php://input');
 $values = json_decode($json, true);
+*/
+
+//multipart/form-data
 
 //php session vorhand ?
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($values['name']) && isset($values['emailInput']) && isset($values['alter']) && isset($values['bewerbungsText'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['emailInput']) && isset($_POST['autor']) && isset($_POST['modname']) && isset($_POST['bewerbungsText']) && isset($_FILES["file"])) {
 
     $date = new DateTime('NOW');
     $date->modify('+7 day');
@@ -24,13 +27,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($values['name']) && isset($va
     $datebewerbung->modify('+9 day');
     $datebewerbungdc = $datebewerbung->format("d.m.Y") . " zwischen 20:00 Uhr und 0:00 Uhr";
 
-    $name = $values['name'];
-    $emailadresse = $values['emailInput'];
-    $alter = $values['alter'];
-    $bewerbungsText = $values['bewerbungsText'];
+    $email = $_POST['emailInput'];
+    $autor = $_POST['autor'];
+    $modname = $_POST['modname'];
+    $bewerbungsText = $_POST['bewerbungsText'];
+    $file = $_FILES['file'];
 
     $mailme = new PHPMailer(true);
     $mailother = new PHPMailer(true);
+
+    //Fileupload
+    $filePath = "./../uploads/".$_FILES["file"]["name"];
+    if(!move_uploaded_file($_FILES["file"]["tmp_name"], $filePath)) {
+        //TODO error
+        http_response_code(405);
+        return;
+    }
+    
 
     try {
         //send email to me
@@ -50,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($values['name']) && isset($va
                 'allow_self_signed' => true
             )
         );
-        $mailme -> isHTML();
+        $mailme->isHTML();
 
 
         //2. from = lani-webseite@gmail.com
@@ -59,10 +72,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($values['name']) && isset($va
         $mailme->addAddress('noreply.bewerbung@real-life-team.de', 'Real-Life-Team Bewerbungen');
 
         //4. message = Erledigt|°
-        $mailme->Subject = "Bewerbung von {$name}";
-        $mailme->Body = "Hallo liebes Real Life Team Hier ein paar  eck daten von mir:<br> <b>Name</b>: {$name}
-        <br><b>Meine E-Mail Adresse</b>: {$emailadresse}<br>
-        <b>Alter</b>: {$alter}<br> <b>Mein Bewerbungs Text</b>: {$bewerbungsText}";
+        $mailme->Subject = "Mod anfrage von {$autor}";
+        $mailme->Body = "Hallo liebes Real Life Team Hier ein paar Eckdaten von dem Mod:<br> <b>Name</b>: {$modname}
+        <br><b>Meine E-Mail Adresse</b>: {$email}<br>
+        <b>Autoren</b>: {$autor}<br> <b>Mod Name</b>: {$modname}<br> <b>Mod Beschreibung</b>: {$bewerbungsText}";
+
+        $mailme->addAttachment($filePath);
+
 
         //send mail other
         //1. Verbindungsaufbau SMTP-Server (gmail, gmx ...)
@@ -87,21 +103,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($values['name']) && isset($va
         //2. from = lani-webseite@gmail.com
         $mailother->setFrom("noreply.bewerbung@real-life-team.de", "Real-Life-Team Bewerbungen");
         //3. to = lani.schlagheck@gmail.com
-        $mailother->addAddress("{$emailadresse}", "{$name}");
+        $mailother->addAddress("{$email}", "{$autor}");
 
         //4. message = Erledigt|°
-        $mailother->Subject = "Bewerbung von {$name} Erhalten";
-        $mailother->Body = "Sehr geerte/r  {$name}<br>Wir haben ihre Bewerbung erhaltern mit folgenden Daten:<br> <b>Name</b>: {$name}
-        <br><b>E-Mail Adresse</b>: {$emailadresse}<br>
-        <b>Alter</b>: {$alter}<br> <b>Mein Bewerbungs Text</b>: {$bewerbungsText}.<br><br> Wir haben deine Bewerbung erhalten und werden diese nun bearbeiten.<br>
-        Sollten wir uns bis zum {$dateformat}, nicht melden, komm bitte am<br>{$datebewerbungdc} auf unseren Discord https://rlteam.eu/dc f&uuml;r ein<br>Bewerbungsgespr&auml;ch.<br>";
-
-
+        $mailother->Subject = "Mod Upload von {$email} Erhalten";
+        $mailother->Body = "Sehr geerte/r  {$autor}<br>Wir haben ihre Mod Upload anfrage erhaltern mit folgenden Daten:<br><b>Name</b>: {$modname}
+        <br><b>Meine E-Mail Adresse</b>: {$email}<br>
+        <b>Autoren</b>: {$autor}<br> <b>Mod Name</b>: {$modname}<br> <b>Mod Beschreibung</b>: {$bewerbungsText}.<br> Wir haben deine Mod Upload Anfrage erhalten und werden diese nun bearbeiten.<br>";
         
+        $mailother->addAttachment($filePath);
+
         //Senden der E-Mail an mich
         if(!$mailme->send()) {
             echo json_encode($mailme->ErrorInfo);
             http_response_code(502);
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
             return;
         }
 
@@ -109,7 +127,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($values['name']) && isset($va
         if(!$mailother->send()) {
             echo json_encode($mailother->ErrorInfo);
             http_response_code(502);
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
             return;
+        }
+
+        if (file_exists($filePath)) {
+            unlink($filePath);
         }
         
         echo json_encode("E-Mail wurde versendet");
@@ -118,9 +143,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($values['name']) && isset($va
     } catch (Exception $e) {
         echo json_encode($e->getMessage());
         http_response_code(501);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
     } catch (\Exception $e) {
         echo json_encode($e->getMessage());
         http_response_code(500);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
     }
 } else {
     echo json_encode("Die Methode ist nicht erlaubt");
